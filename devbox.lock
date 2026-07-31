@@ -1,9 +1,168 @@
 {
   "lockfile_version": "1",
   "packages": {
+    "cudaPackages.cuda_cudart": {
+      "resolved": "github:NixOS/nixpkgs/421eebfd0ec7bccd4abe826ce62d7e6e83129493?narHash=sha256-%2FFCliTPgiuV1owejZFNx3Ch9irdvkOfOFl%2BHHZ%2BDrtM%3D#cudaPackages.cuda_cudart",
+      "source": "nixpkg",
+      "systems": {
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "path": "/nix/store/hc5s6x4dgirn2dv3kfl6wy5adk9z9sw6-cuda12.9-cuda_cudart-12.9.79",
+              "default": true
+            }
+          ]
+        }
+      }
+    },
+    "cudaPackages.cuda_nvrtc": {
+      "resolved": "github:NixOS/nixpkgs/421eebfd0ec7bccd4abe826ce62d7e6e83129493?narHash=sha256-%2FFCliTPgiuV1owejZFNx3Ch9irdvkOfOFl%2BHHZ%2BDrtM%3D#cudaPackages.cuda_nvrtc",
+      "source": "nixpkg",
+      "systems": {
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "path": "/nix/store/ylgqa232sbrr3h1cvm3r330ps9zhz17k-cuda12.9-cuda_nvrtc-12.9.86",
+              "default": true
+            }
+          ]
+        }
+      }
+    },
+    "cudaPackages.cudatoolkit": {
+      "resolved": "github:NixOS/nixpkgs/421eebfd0ec7bccd4abe826ce62d7e6e83129493?narHash=sha256-%2FFCliTPgiuV1owejZFNx3Ch9irdvkOfOFl%2BHHZ%2BDrtM%3D#cudaPackages.cudatoolkit",
+      "source": "nixpkg",
+      "systems": {
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "path": "/nix/store/kjwprsaj8y6p787i1svwrf81a6551w2b-cuda-merged-12.9",
+              "default": true
+            }
+          ]
+        }
+      }
+    },
+    "cudaPackages.cudnn": {
+      "resolved": "github:NixOS/nixpkgs/421eebfd0ec7bccd4abe826ce62d7e6e83129493?narHash=sha256-%2FFCliTPgiuV1owejZFNx3Ch9irdvkOfOFl%2BHHZ%2BDrtM%3D#cudaPackages.cudnn",
+      "source": "nixpkg",
+      "systems": {
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "path": "/nix/store/zwjikzm7phchw6n2mpksd082f0j11k5g-cuda12.9-cudnn-9.22.0.52",
+              "default": true
+            }
+          ]
+        }
+      }
+    },
+    "cudaPackages.libcublas": {
+      "resolved": "github:NixOS/nixpkgs/421eebfd0ec7bccd4abe826ce62d7e6e83129493?narHash=sha256-%2FFCliTPgiuV1owejZFNx3Ch9irdvkOfOFl%2BHHZ%2BDrtM%3D#cudaPackages.libcublas",
+      "source": "nixpkg",
+      "systems": {
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "path": "/nix/store/d34s2sj8wzhj14cxr7mv497c87igk4jj-cuda12.9-libcublas-12.9.1.4",
+              "default": true
+            }
+          ]
+        }
+      }
+    },
+    "cudaPackages.libcufft": {
+      "resolved": "github:NixOS/nixpkgs/421eebfd0ec7bccd4abe826ce62d7e6e83129493?narHash=sha256-%2FFCliTPgiuV1owejZFNx3Ch9irdvkOfOFl%2BHHZ%2BDrtM%3D#cudaPackages.libcufft",
+      "source": "nixpkg",
+      "systems": {
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "path": "/nix/store/1h5l9rwbjnnw3bzva0zmqcsfsbd09z6d-cuda12.9-libcufft-11.4.1.4",
+              "default": true
+            }
+          ]
+        }
+      }
+    },
+    "cudaPackages.libcurand": {
+      "resolved": "github:NixOS/nixpkgs/421eebfd0ec7bccd4abe826ce62d7e6e83129493?narHash=sha256-%2FFCliTPgiuV1owejZFNx3Ch9irdvkOfOFl%2BHHZ%2BDrtM%3D#cudaPackages.libcurand",
+      "source": "nixpkg",
+      "systems": {
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "path": "/nix/store/m8lk2k85cr5rpda54sdy81s3lgh2isgg-cuda12.9-libcurand-10.3.10.19",
+              "default": true
+            }
+          ]
+        }
+      }
+    },
+    "cudaPackages.libcusolver": {
+      "resolved": "github:NixOS/nixpkgs/421eebfd0ec7bccd4abe826ce62d7e6e83129493?narHash=sha256-%2FFCliTPgiuV1owejZFNx3Ch9irdvkOfOFl%2BHHZ%2BDrtM%3D#cudaPackages.libcusolver",
+      "source": "nixpkg",
+      "systems": {
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "path": "/nix/store/2s3a2my0yq4k48hhww4r0cd5hk3hyjvy-cuda12.9-libcusolver-11.7.5.82",
+              "default": true
+            }
+          ]
+        }
+      }
+    },
+    "cudaPackages.libcusparse": {
+      "resolved": "github:NixOS/nixpkgs/421eebfd0ec7bccd4abe826ce62d7e6e83129493?narHash=sha256-%2FFCliTPgiuV1owejZFNx3Ch9irdvkOfOFl%2BHHZ%2BDrtM%3D#cudaPackages.libcusparse",
+      "source": "nixpkg",
+      "systems": {
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "path": "/nix/store/qd43az837bw3620iiqaysnw753rwklls-cuda12.9-libcusparse-12.5.10.65",
+              "default": true
+            }
+          ]
+        }
+      }
+    },
+    "git": {
+      "resolved": "github:NixOS/nixpkgs/421eebfd0ec7bccd4abe826ce62d7e6e83129493?narHash=sha256-%2FFCliTPgiuV1owejZFNx3Ch9irdvkOfOFl%2BHHZ%2BDrtM%3D#git",
+      "source": "nixpkg",
+      "systems": {
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "path": "/nix/store/1k2lblqlj39azh6wn1sffa2869vrg3mr-git-2.54.0",
+              "default": true
+            }
+          ]
+        }
+      }
+    },
     "github:NixOS/nixpkgs/nixpkgs-unstable": {
       "last_modified": "2026-07-20T13:48:30Z",
       "resolved": "github:NixOS/nixpkgs/421eebfd0ec7bccd4abe826ce62d7e6e83129493?lastModified=1784555310&narHash=sha256-%2FFCliTPgiuV1owejZFNx3Ch9irdvkOfOFl%2BHHZ%2BDrtM%3D"
+    },
+    "pciutils": {
+      "resolved": "github:NixOS/nixpkgs/421eebfd0ec7bccd4abe826ce62d7e6e83129493?narHash=sha256-%2FFCliTPgiuV1owejZFNx3Ch9irdvkOfOFl%2BHHZ%2BDrtM%3D#pciutils",
+      "source": "nixpkg",
+      "systems": {
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "path": "/nix/store/3jg5gw4pcg25jdaa0kl78q63ibiylrbs-pciutils-3.15.0",
+              "default": true
+            },
+            {
+              "name": "man",
+              "path": "/nix/store/fmkvnxvk6nwvhwxcp68ix99v0haqfhdx-pciutils-3.15.0-man",
+              "default": true
+            }
+          ]
+        }
+      }
     },
     "python@3.12": {
       "last_modified": "2026-07-08T21:13:06Z",
@@ -59,6 +218,54 @@
             }
           ],
           "store_path": "/nix/store/3jm89jy56cprn52iw8vanpav58hlcj1v-python3-3.12.13"
+        }
+      }
+    },
+    "stdenv.cc.cc.lib": {
+      "resolved": "github:NixOS/nixpkgs/421eebfd0ec7bccd4abe826ce62d7e6e83129493?narHash=sha256-%2FFCliTPgiuV1owejZFNx3Ch9irdvkOfOFl%2BHHZ%2BDrtM%3D#stdenv.cc.cc.lib",
+      "source": "nixpkg",
+      "systems": {
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "lib",
+              "path": "/nix/store/8lahnh9pn3lrrnhax5nk7ibvjcbjmnkm-gcc-15.2.0-lib",
+              "default": true
+            }
+          ]
+        }
+      }
+    },
+    "which": {
+      "resolved": "github:NixOS/nixpkgs/421eebfd0ec7bccd4abe826ce62d7e6e83129493?narHash=sha256-%2FFCliTPgiuV1owejZFNx3Ch9irdvkOfOFl%2BHHZ%2BDrtM%3D#which",
+      "source": "nixpkg",
+      "systems": {
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "path": "/nix/store/3787a1nqwp1n8wp9qg9k6ys8n48ri99s-which-2.25",
+              "default": true
+            },
+            {
+              "name": "man",
+              "path": "/nix/store/l3gzcfm7d36jgnvcmv9ajj302jjb96l9-which-2.25-man",
+              "default": true
+            }
+          ]
+        }
+      }
+    },
+    "zlib": {
+      "resolved": "github:NixOS/nixpkgs/421eebfd0ec7bccd4abe826ce62d7e6e83129493?narHash=sha256-%2FFCliTPgiuV1owejZFNx3Ch9irdvkOfOFl%2BHHZ%2BDrtM%3D#zlib",
+      "source": "nixpkg",
+      "systems": {
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "path": "/nix/store/b2swxfi8srrbsafvh9iyyhd26mz9giwf-zlib-1.3.2",
+              "default": true
+            }
+          ]
         }
       }
     }

@@ -1,10 +1,32 @@
 {
   "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.17.2/.schema/devbox.schema.json",
-  "packages": ["python@3.12"],
+  "packages": [
+    "python@3.12",
+    "cudaPackages.cudatoolkit",
+    "cudaPackages.cuda_cudart",
+    "cudaPackages.libcublas",
+    "cudaPackages.libcufft",
+    "cudaPackages.libcurand",
+    "cudaPackages.libcusolver",
+    "cudaPackages.libcusparse",
+    "cudaPackages.cudnn",
+    "cudaPackages.cuda_nvrtc",
+    "stdenv.cc.cc.lib",
+    "zlib",
+    "git",
+    "which",
+    "pciutils"
+  ],
   "shell": {
-    "init_hook": [". $VENV_DIR/bin/activate"],
-    "scripts": {
-      "test": ["echo \"Error: no test specified\" && exit 1"]
-    }
+    "init_hook": [
+      ". $VENV_DIR/bin/activate",
+      "echo 'Registrando kernel Jupyter com CUDA...'",
+      "python3 ~/Documents/workspace/ufabc/ccm-109/regenerate_kernel.py"
+    ]
+  },
+  "env": {
+    "CUDA_VISIBLE_DEVICES": "0",
+    "__NV_PRIME_RENDER_OFFLOAD": "1",
+    "__GLX_VENDOR_LIBRARY_NAME": "nvidia"
   }
 }
