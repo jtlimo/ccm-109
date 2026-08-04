@@ -1,0 +1,101 @@
+\documentclass[12pt]{article}
+
+\usepackage{sbc-template}
+\usepackage{graphicx,url}
+\usepackage{microtype}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{comment}
+\usepackage{lipsum}
+\usepackage{csquotes}
+\usepackage{url}
+\usepackage[section]{placeins}
+\usepackage[
+    style=authoryear,
+    citestyle=authoryear,
+    backend=biber
+]{biblatex}
+\usepackage{pgfplots}
+
+\pgfplotsset{compat=1.18}
+\addbibresource{references.bib}
+
+\DeclareFieldFormat{labelyear}{#1}
+\renewcommand*{\nameyeardelim}{\addspace}
+\renewbibmacro*{cite}{%
+  \printtext[brackets]{%
+    \printnames{labelname}%
+    \setunit{\nameyeardelim}%
+    \printfield{labelyear}%
+  }}
+
+\urlstyle{same} 
+
+\sloppy
+
+\title{Algum título do artigo
+}
+
+\author{Jessica Fileto\inst{1}}
+
+\address{
+  Centro de Matemática, Computação e Cognição\\
+  Universidade Federal do ABC (UFABC)\\
+  Av. dos Estados, 5001 -- 09210-580 -- Santo André -- SP -- Brasil
+  \email{\{jessica.fileto\}@ufabc.edu.br}
+}
+
+\begin{document}
+
+\maketitle
+     
+\begin{resumo} 
+\lipsum[1-2]
+\end{resumo}
+
+\section{Introdução}
+
+\lipsum[1-5]
+
+\section{Trabalhos relacionados}
+
+\lipsum[1-3]
+
+\section{Delimitação e Escopo}
+
+\lipsum[1-2]
+
+\section{Metodologia}
+\lipsum[1-6]
+
+\subsection{Divisão dos dados}
+\lipsum[1-2]
+
+\subsection{Matthews Correlation Coefficient (MCC)}
+\lipsum[1-2]
+
+\subsection{Pré-Processamento dos dados}
+\lipsum[1-2]
+
+\subsection{Análise do desempenho}
+\lipsum[1]
+
+\section{Resultados e discussões}
+
+\lipsum[1-3]
+
+\subsection{Métricas de performance}
+\lipsum[1]
+
+\section{Conclusão}
+
+\lipsum[1]
+
+
+\section{Trabalhos Futuros}
+
+\lipsum[1]
+
+\printbibliography
+
+\end{document}
