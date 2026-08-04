@@ -1,4 +1,6 @@
 .ipynb_checkpoints
 .venv
 .devbox
-
+article/artigo.*
+!artigo.tex
+!artigo.pdf
