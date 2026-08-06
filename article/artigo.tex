@@ -33,8 +33,7 @@
 
 \sloppy
 
-\title{Algum título do artigo
-}
+\title{Deteção de Deepfakes: Uma Abordagem com SigLIP2 e Explicabilidade via Grad-CAM}
 
 \author{Jessica Fileto\inst{1}}
 
@@ -42,7 +41,7 @@
   Centro de Matemática, Computação e Cognição\\
   Universidade Federal do ABC (UFABC)\\
   Av. dos Estados, 5001 -- 09210-580 -- Santo André -- SP -- Brasil
-  \email{\{jessica.fileto\}@ufabc.edu.br}
+  \email{jessica.fileto@ufabc.edu.br}
 }
 
 \begin{document}
@@ -50,51 +49,113 @@
 \maketitle
      
 \begin{resumo} 
-\lipsum[1-2]
+Um dos grandes desafios atuais é a mitigação da desinformação, especialmente com o
+advento de vídeos sintéticos hiper-realistas, conhecidos como deepfakes.
+O desenvolvimento de técnicas de detecção de deepfakes é crucial para preservar a integridade da informação
+e proteger indivíduos contra a disseminação de conteúdo falso.
+Além disso, a explicabilidade dos modelos de detecção é essencial para aumentar a confiança dos usuários
+e permitir uma compreensão mais profunda das decisões do modelo.
+Este artigo propõe uma abordagem para a detecção de deepfakes utilizando SigLIP2
+para extração de características visuais, juntamente com técnicas de explicabilidade,
+como Grad-CAM, para fornecer insights sobre as decisões do modelo. A metodologia envolve o pré-processamento de dados,
+extração de características com SigLIP2, seguida pela classificação utilizando redes neurais profundas.
+A avaliação do desempenho do modelo é realizada através de métricas de precisão.
+Para garantir a robustez do modelo, é realizado o teste da generalização em diferentes \textit{datasets},
+sendo estes: Celeb-DF, DeeperForensics-1.0 e um \textit{dataset} customizado.
 \end{resumo}
+
+\begin{abstract}
+One of the major challenges today is the mitigation of disinformation,
+particularly with the advent of hyper-realistic synthetic videos known as deepfakes.
+The development of deepfake detection techniques is crucial for preserving information
+integrity and protecting individuals against the dissemination of false content.
+Furthermore, the explainability of detection models is essential for increasing user trust and enabling a deeper understanding of model decisions.
+This paper proposes an approach for deepfake detection using SigLIP2 for visual feature extraction,
+together with explainability techniques such as Grad-CAM to provide insights into the model's decisions.
+The methodology involves data preprocessing, feature extraction with SigLIP2, followed by classification using deep neural networks.
+Model performance is evaluated through precision metrics.
+To ensure model robustness, generalization testing is conducted across different datasets, namely: Celeb-DF, DeeperForensics-1.0, and a custom-built dataset.
+\end{abstract}
 
 \section{Introdução}
 
-\lipsum[1-5]
+A divulgação de conteúdo é uma das formas mais comuns de comunicação,
+principalmente com o advento das redes sociais. Mídias diversas podem ser distribuídas como foto, áudio e vídeo.
+
+Com o acesso facilitado a ferramentas de inteligência artificial generativa (GenAI),
+como por exemplo, Kling AI \cite{KlingAINextGeneration} , Runway \cite{RunwayBuildingAI} e o próprio Veo da Google \cite{Veo3Google},
+os usuários conseguem através de imagens (IPV) e texto (TPV) gerar vídeos hiper realistas,
+o que torna imperceptível ao ser humano detectar se foi gerado sinteticamente ou não.
+Estes vídeos podem ser utilizados para espalhar desinformação e causar danos a sociedade como um todo.
+Um dos métodos mais comuns de desinformação é o \textit{deepfake}, que consiste em vídeos ou imagens manipuladas com o intuito de enganar o público.
+Os \textit{deepfakes} são criados utilizando \textit{deep learning}, que é uma técnica de aprendizado de máquina,
+para substituir o rosto de uma pessoa por outro em um vídeo existente, 
+ou criar um vídeo completamente novo com a aparência de uma pessoa real. \cite{dagarLiteratureReviewPerspectives2022a}
+
+Apesar de passar credibilidade, as pessoas tendem a não acreditar na mensagem passada,
+caso o conteúdo não seja condizente. Por exemplo, um político moderado ter falas de extrema direita,
+porém caso a alteração seja sutil existe uma tendência a não ser percebido como \textit{deepfake}.
+\cite{hameleersYouWontBelieve2022,hameleersTheyWouldNever2024}
+
+Segundo \textcite[p.~10]{hameleersYouWontBelieve2022} “A desinformação que é congruente com as crenças anteriores das pessoas
+pode reforçar as crenças existentes.“
+
+A quantidade massiva de conteúdo sintético nas redes sociais ocasiona a fadiga de discernimento
+da autenticidade do conteúdo que o usuário interage e impacta sua capacidade
+e vontade de interagir criticamente com os meios de comunicação,
+que propicia a aceitação passiva do conteúdo disponível. \cite{liuWhenSeeingNot2025a}
+
+Segundo o relatório da \textit{Security Hero}, 98\% das \textit{deepfakes} online são de pornografia. \cite{2023StateDeepfakes}
+Em relação ao Brasil, o relatório da Agência Lupa aborda o crescimento de 25,77\% 
+no uso de GenIA na disseminação de desinformação no ano de 2025, sendo o tipo de conteúdo mais disseminado, o vídeo.
+O maior alvo de desinformação continua sendo a polarização política, atingindo 50,2\% 
+da quantidade de conteúdos nacionais analisados pela Agência Lupa em 2025. \cite{correaPanoramaDesinformacaoNo2026}
+A \textit{SaferNet} fez um levantamento dos casos de deepfakes,
+focados em deepfakes de pornografia em escolas brasileiras. Neste âmbito dos 27 estados foram constatados 10 estados
+com relatos desta prática. \cite{MapeamentoSaferNetIdentificaa}
+
+Os danos desta prática são imensos, visto que mesmo que ocorra a detecção do conteúdo \textit{fake},
+no caso o deepfake de pornografia, isto não impede sua rápida disseminação e reenvio entre plataformas.
+Por fim, saber que uma imagem é falsa não anula os danos ou perda de dignidade infligida à pessoa retratada.
+\cite{mahrSexualizedDeepfakesSociotechnical2026}
 
 \section{Trabalhos relacionados}
+Com o aumento da criação de deepfakes, houve também uma crescente pesquisa relacionada aos métodos de detecção.
+Inicialmente, principalmente no campo forense, eram utilizadas técnicas voltadas a análise pixel a pixel.
+O objetivo é encontrar inconsistências frame a frame, relacionados ao piscar dos olhos,
+postura, diferenças de tom de pele e inconsistências da iluminação. 
 
-\lipsum[1-3]
+As técnicas tradicionais de aprendizado de máquina (ML), também são empregadas na detecção de deepfakes,
+sendo as mais comumente utilizadas o perceptron multicamada (MLP), regressão logística (LR) dentre outros modelos que são o estado da arte. 
+
+Com o avanço das técnicas de geração de deepfakes, foi necessário avançar nos métodos de detecção.
+Os métodos mais utilizados atualmente são os modelos baseados em Deep Learning, como por exemplo, redes neurais convolucionais (CNN),
+redes neurais recorrentes (RNN) e redes neurais convolucionais baseadas em região (RCNN). 
+
+Conforme  “Após o sucesso dos transformadores em visão computacional (ViT), houve uma exploração do ViT e variantes espaço-temporais […]”.
+Um desses modelos utilizados é o SigLIP , que por ser pré-treinado em um extenso dataset é costumeiramente utilizado como um backbone congelado para extração de características 
 
 \section{Delimitação e Escopo}
 
-\lipsum[1-2]
-
 \section{Metodologia}
-\lipsum[1-6]
+
 
 \subsection{Divisão dos dados}
-\lipsum[1-2]
 
-\subsection{Matthews Correlation Coefficient (MCC)}
-\lipsum[1-2]
 
 \subsection{Pré-Processamento dos dados}
-\lipsum[1-2]
+
 
 \subsection{Análise do desempenho}
-\lipsum[1]
+
 
 \section{Resultados e discussões}
 
-\lipsum[1-3]
-
 \subsection{Métricas de performance}
-\lipsum[1]
 
 \section{Conclusão}
 
-\lipsum[1]
-
-
 \section{Trabalhos Futuros}
-
-\lipsum[1]
 
 \printbibliography
 
