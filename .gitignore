@@ -4,3 +4,4 @@
 article/artigo.*
 !artigo.tex
 !artigo.pdf
+__pycache__
