@@ -17,7 +17,7 @@ def get_detector():
     return detector
 
 def normalize_siglip2(face_rgb: np.ndarray) -> np.ndarray:
-    resized = cv2.resize(face_rgb, (cfg['target_size'], cfg['target_size']), interpolation=cv2.INTER_CUBIC)
+    resized = cv2.resize(face_rgb, (cfg['img_size'], cfg['img_size']), interpolation=cv2.INTER_CUBIC)
     normalized = (resized.astype(np.float32) / 255.0 - cfg['siglip_mean']) / cfg['siglip_std']
     return normalized
 
@@ -104,7 +104,7 @@ def process_video(video_path: str, output_dir: str) -> int:
     return saved_count
 
 def preprocess_video(video_path, output_dir=None):
-    output_dir = output_dir or cfg["frames_output_dir"]
+    output_dir = output_dir or cfg["pred_output_dir"]
     video_path = Path(video_path)
     video_name = video_path.stem
     
@@ -112,16 +112,15 @@ def preprocess_video(video_path, output_dir=None):
     
     if n_faces == 0:
        print(f"[INFO] Nenhuma face detectada em {video_path.name}")
-       return {"frame_paths": [], "video_name": video_name}
+       return {"frame_paths": []}
 
     video_dir = Path(output_dir) / video_name
     frame_paths = sorted(video_dir.glob("*.jpg"))
 
 
     if frame_paths is None or len(frame_paths) == 0:
-         return {"tensor": None, "frame_paths": [], "video_name": video_name}
+         return {"frame_paths": []}
 
     return {
         "frame_paths": [str(p) for p in frame_paths],
-        "video_name": video_name,
     }
