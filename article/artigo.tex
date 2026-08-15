@@ -61,7 +61,7 @@ como Grad-CAM, para fornecer insights sobre as decisões do modelo. A metodologi
 extração de características com SigLIP2, seguida pela classificação utilizando redes neurais profundas.
 A avaliação do desempenho do modelo é realizada através de métricas de precisão.
 Para garantir a robustez do modelo, é realizado o teste da generalização em diferentes \textit{datasets},
-sendo estes: Celeb-DF, DeeperForensics-1.0 e um \textit{dataset} customizado.
+sendo estes: Celeb-DF e um \textit{dataset} customizado.
 \end{resumo}
 
 \begin{abstract}
@@ -74,7 +74,8 @@ This paper proposes an approach for deepfake detection using SigLIP2 for visual 
 together with explainability techniques such as Grad-CAM to provide insights into the model's decisions.
 The methodology involves data preprocessing, feature extraction with SigLIP2, followed by classification using deep neural networks.
 Model performance is evaluated through precision metrics.
-To ensure model robustness, generalization testing is conducted across different datasets, namely: Celeb-DF, DeeperForensics-1.0, and a custom-built dataset.
+To ensure model robustness, generalization testing is conducted across different datasets,
+namely: Celeb-DF and a custom-built dataset.
 \end{abstract}
 
 \section{Introdução}
@@ -120,30 +121,113 @@ Por fim, saber que uma imagem é falsa não anula os danos ou perda de dignidade
 \cite{mahrSexualizedDeepfakesSociotechnical2026}
 
 \section{Trabalhos relacionados}
-Com o aumento da criação de deepfakes, houve também uma crescente pesquisa relacionada aos métodos de detecção.
-Inicialmente, principalmente no campo forense, eram utilizadas técnicas voltadas a análise pixel a pixel.
-O objetivo é encontrar inconsistências frame a frame, relacionados ao piscar dos olhos,
-postura, diferenças de tom de pele e inconsistências da iluminação. 
 
-As técnicas tradicionais de aprendizado de máquina (ML), também são empregadas na detecção de deepfakes,
-sendo as mais comumente utilizadas o perceptron multicamada (MLP), regressão logística (LR) dentre outros modelos que são o estado da arte. 
+Com o aumento da criação de \textit{deepfakes}, houve também uma crescente pesquisa relacionada aos métodos de detecção.
+Inicialmente, principalmente no campo forense, eram utilizadas técnicas voltadas a análise \textit{pixel} a \textit{pixel}.
+O objetivo é encontrar inconsistências \textit{frame} a \textit{frame}, relacionados ao piscar dos olhos,
+postura, diferenças de tom de pele e inconsistências da iluminação. \cite{dagarLiteratureReviewPerspectives2022a}
 
-Com o avanço das técnicas de geração de deepfakes, foi necessário avançar nos métodos de detecção.
-Os métodos mais utilizados atualmente são os modelos baseados em Deep Learning, como por exemplo, redes neurais convolucionais (CNN),
-redes neurais recorrentes (RNN) e redes neurais convolucionais baseadas em região (RCNN). 
+As técnicas tradicionais de aprendizado de máquina (ML), também são empregadas na detecção de \textit{deepfakes},
+sendo as mais comumente utilizadas o \textit{perceptron} multicamada (MLP), regressão logística (LR)
+dentre outros modelos que são o estado da arte. \cite{sharmaSystematicLiteratureReview2025}
 
-Conforme  “Após o sucesso dos transformadores em visão computacional (ViT), houve uma exploração do ViT e variantes espaço-temporais […]”.
-Um desses modelos utilizados é o SigLIP , que por ser pré-treinado em um extenso dataset é costumeiramente utilizado como um backbone congelado para extração de características 
+Com o avanço das técnicas de geração de \textit{deepfakes}, foi necessário também avançar nos métodos de detecção.
+Os métodos mais utilizados atualmente são os modelos baseados em \textit{Deep Learning}, como por exemplo,
+redes neurais convolucionais (CNN),
+redes neurais recorrentes (RNN) e redes neurais convolucionais baseadas em região (RCNN).
+\cite{sharmaSystematicLiteratureReview2025,ranaDeepfakeDetectionSystematic2022}
+
+Conforme \textcite{tCombatingDeepfakesTransformer2025}
+“Após o sucesso dos transformadores em visão computacional (ViT),
+houve uma exploração do ViT e variantes espaço-temporais […]”.
+Um desses modelos utilizados é o \textit{SigLIP} , que por ser pré-treinado em um extenso \textit{dataset}
+é costumeiramente utilizado como um \textit{backbone} congelado para extração de características.
 
 \section{Delimitação e Escopo}
 
+Os \textit{datasets} utilizados neste trabalho são os seguintes:
+\begin{enumerate}
+  \item FaceForensics++ para o treinamento do modelo \cite{rosslerFaceForensicsLearningDetect2019}
+  \item CelebDF para a validação cruzada \cite{liCelebDFLargescaleChallenging2020}
+  \item \textit{Dataset} customizado com vídeos de redes sociais como \textit{Instagram}
+   e \textit{TikTok}, além de vídeos do \textit{Youtube}
+\end{enumerate}
+
+Nas próximas seções se estabelecerá a execução do trabalho.
+Na seção 4, se discutirá a metodologia, construção do modelo de detecção a ser
+implementado. Logo, os resultados e 
+discussões serão apresentados na seção 5.
+Finalmente, as conclusões sobre o trabalho serão expostos na seção 6.
+
 \section{Metodologia}
+A metodologia adotada neste trabalho segue o estado da arte na detecção de deepfake.
+
+Primeiramente será realizada a extração dos rostos dos \textit{frames} dos vídeos, para tal,
+será utilizada a biblioteca MTCNN para detecção e recorte dos rostos. \cite{7553523,zhang2017detecting}
+
+Com a extração de rostos concluída, ocorrerá a extração de características utilizando o \textit{backbone}
+congelado \textit{SigLip2}. O modelo escolhido foi o \textit{siglip2\_base\_patch16\_224}
+que contém 375.19 milhões de parâmetros. \cite{tschannen2025siglip2multilingualvisionlanguage}
+
+Para otimizar o tempo de processamento, a etapa de extração de rostos foi realizada localmente.
+
+O treinamento do modelo, que inclui o passo de extração das features foi realizado na nuvem, através do plano
+gratuito do \textit{Google Colab}. As características extraídas são salvas, criando um \textit{cache},
+para caso seja necessário um \textit{fine tunning} no classificador não ocorra a
+extração das características novamente, o que agiliza o processo de experimentação.
+
+Para a avaliação do desempenho do modelo, serão analisadas as seguintes métricas: acurácia, precisão,
+área sob a curva \textit{ROC} (\textit{AUC}) e \textit{recall}. \cite{sharmaSystematicLiteratureReview2025}
+
+Com o objetivo de viabilizar a explicabilidade às decisões tomadas pelo modelo, após a inferência, foi inserida
+a biblioteca \textit{GRAD-CAM}. \cite{gradcam2016}
+Como o modelo construído é baseado em \textit{transformers}, por conta da utilização do \textit{SigLip2}, foi necessária
+a adaptação da biblioteca para o uso neste contexto.
 
 
 \subsection{Divisão dos dados}
+Os dados foram separados da seguinte forma: utilizando a biblioteca \textit{sklearn}
+que possui implementado o método de \textit{split} \textit{GroupKfold}. Este método consiste 
+em dividir o \textit{dataset} em k subconjuntos, treinando em k-1 subconjuntos
+e testando o restante. Este processo é repetido k vezes, proporcionando
+uma avaliação robusta do desempenho do modelo. \cite{sharmaSystematicLiteratureReview2025}
+
+\subsection{Hardware}
+Para o desenvolvimento do modelo, foram utilizados dois computadores distintos, que serão descritos a seguir:
+
+\textbf{Notebook Avell:}
+\begin{itemize}
+  \item \textbf{CPU:} Intel Core i5-9300H
+  \item \textbf{Memória:} 64 GiB
+  \item \textbf{Placa de vídeo:} NVIDIA GeForce GTX 1050 4GB
+\end{itemize}
+
+\textbf{Mac Mini:}
+\begin{itemize}
+  \item \textbf{CPU:} Apple M1 - 8 \textit{Cores} (4 de performance e 4 de eficiência)
+  \item \textbf{Memória:} 16GB
+\end{itemize}
+
+Além destes hardwares citados, foi utilizado no treinamento e na predição o \textit{Google Colab},
+no plano gratuito é disponibilizada a placa de vídeo (GPU) T4, que garantiu que ocorresse o treinamento do modelo
+e a validação cruzada sem intercorrências.
 
 
 \subsection{Pré-Processamento dos dados}
+Por conta da restrição computacional,
+o pré-processamento foi realizado utilizando a biblioteca MTCNN \cite{7553523, zhang2017detecting}
+para a identificação e extração das faces dos \textit{frames} do vídeo.
+No entanto, como o \textit{dataset} do FaceForensics++ tem um alto volume de dados, mesmo tendo se limitado
+aos vídeos comprimidos (c23), foi necessário restringir a quantidade de \textit{frames} avaliados.
+
+Para cada vídeo processado do \textit{dataset}, estas foram as restrições impostas:
+
+\begin{itemize}
+  \item \textit{skip} de \textit{frames} = 9
+  \item quantidade máxima de \textit{frames} avaliados que contenham um rosto
+  detectado = 30
+  \item limite de leitura total de \textit{frames} por vídeo = 1000
+\end{itemize}
 
 
 \subsection{Análise do desempenho}
