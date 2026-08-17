@@ -8,6 +8,8 @@
 \usepackage{comment}
 \usepackage{lipsum}
 \usepackage{csquotes}
+\usepackage{booktabs}
+\usepackage{graphicx}
 \usepackage{url}
 \usepackage[section]{placeins}
 \usepackage[
@@ -186,11 +188,32 @@ a adaptação da biblioteca para o uso neste contexto.
 
 
 \subsection{Divisão dos dados}
-Os dados foram separados da seguinte forma: utilizando a biblioteca \textit{sklearn}
-que possui implementado o método de \textit{split} \textit{GroupKfold}. Este método consiste 
-em dividir o \textit{dataset} em k subconjuntos, treinando em k-1 subconjuntos
-e testando o restante. Este processo é repetido k vezes, proporcionando
-uma avaliação robusta do desempenho do modelo. \cite{sharmaSystematicLiteratureReview2025}
+
+\subsubsection{Treinamento}
+Os dados foram divididos com o método \textit{GroupShuffleSplit}
+da biblioteca \textit{scikit-learn}, nas proporções de 70\%, 15\% e 15\%
+para treinamento, validação e teste, respectivamente.
+
+\subsubsection{Validação cruzada}
+A validação cruzada foi realizada tanto \textit{in-domain} quanto \textit{cross-domain}, para
+garantir a robustez do modelo.
+
+A validação \textit{in-domain} foi realizada nos 15\% definidos como conjunto de teste.
+Já a validação \textit{cross-domain} foi realizada em 400 vídeos do \textit{Celeb-DF}, sendo
+200 \textit{fake} e 200 sem manipulação. Além de ocorrer em 16 vídeos de um conjunto de dados customizado.
+
+As validações foram realizadas tanto no modelo temporal quanto no espacial \textit{(frame a frame)}.
+
+
+\subsection{Matthews Correlation Coefficient (MCC)}
+O \textit{Matthews Correlation Coefficient} (MCC) é uma métrica
+de avaliação de modelos de classificação binária,
+que posteriormente foi extrapolada para classificação multiclasse. \cite{MCC}
+
+Neste trabalho será utilizado o MCC,
+juntamente com a acurácia para avaliar a eficácia
+dos modelos na detecção de \textit{deepfakes}.
+
 
 \subsection{Hardware}
 Para o desenvolvimento do modelo, foram utilizados dois computadores distintos, que serão descritos a seguir:
@@ -209,7 +232,7 @@ Para o desenvolvimento do modelo, foram utilizados dois computadores distintos, 
 \end{itemize}
 
 Além destes hardwares citados, foi utilizado no treinamento e na predição o \textit{Google Colab},
-no plano gratuito é disponibilizada a placa de vídeo (GPU) T4, que garantiu que ocorresse o treinamento do modelo
+no plano Pro. É disponibilizada diferentes placas de vídeo (GPU), que garantiu que ocorresse o treinamento do modelo
 e a validação cruzada sem intercorrências.
 
 
@@ -229,13 +252,84 @@ Para cada vídeo processado do \textit{dataset}, estas foram as restrições imp
   \item limite de leitura total de \textit{frames} por vídeo = 1000
 \end{itemize}
 
+\subsection{Experimentos}
+
+Para a construção do modelo final que será utilizado para a validação cruzada tanto \textit{in-domain},
+quanto \textit{cross-domain}, foram realizados diversos experimentos para o \textit{fine-tunning} do modelo.
+
+A tabela \ref{tab:todos_experimentos} trás os experimentos realizados com as respectivas métricas de desempenho.
+
+\begin{table}[htbp]
+\centering
+\caption{Resumo comparativo de todos os experimentos do pipeline de detecção de deepfakes no FaceForensics++ (FF++).}
+\label{tab:todos_experimentos}
+\setlength{\tabcolsep}{4pt} 
+\resizebox{\textwidth}{!}{
+\begin{tabular}{lccccc}
+\toprule
+\textbf{Experimento / Abordagem} & \textbf{Estratégia Principal} & \textbf{Nível} & \textbf{Acurácia (\%)} & \textbf{Recall Real} & \textbf{AUC-ROC} \\
+\midrule
+Experimento 1 & Baseline (Treino Inicial) & Frame & 85,50 & 0,4500 & 0,8740 \\
+Experimento 2 & Treino Restaurado & Frame & 84,20 & 0,5400 & 0,8720 \\
+Experimento 3 & Ajuste de Limiar (\textit{Threshold}) & Frame & 78,00 & 0,8100 & 0,8720 \\
+Experimento 4 & Ponderação de Classes (\textit{Class Weighting}) & Frame & 81,00 & 0,7400 & 0,8720 \\
+Experimento 5 (Original) & Focal Loss + MixUp até Época 5 & Frame & 80,70 & 0,7500 & 0,8710 \\
+Experimento 5 (Re-execução) & Validação Padrão Ouro & Frame & 83,00 & 0,7100 & 0,8800 \\
+\midrule
+BiGRU Temporal (Validação) & Agregação Sequencial (30 frames) & Vídeo & 88,70 & 0,9787 & 0,9854 \\
+BiGRU Temporal (Teste) & Avaliação Final em Nível de Vídeo & Vídeo & 88,30 & 0,9886 & 0,9825 \\
+\bottomrule
+\end{tabular}%
+}
+\end{table}
+
+Para garantir que a rede priorize exemplos complexos durante o treinamento e ganhe robustez,
+conforme proposto por \textcite{sharmaExploringRoleLoss2025a},
+avaliou-se a substituição da função de perda \textit{binary cross-entropy} pela \textit{focal loss}.
+
+Com os resultados obtidos nos experimentos, foram salvos para utilização na predição posterior em \textit{cross-domain}
+os modelos: Espacial Experimento 5 (\textit{Focal Loss + MixUp até Época 5}) e \textit{BiGRU} temporal com \textit{Focal Loss}.
+
+O experimento com \textit{BiGRU} foi executado para tentar avaliar se haveria uma melhora de performance ao avaliar além do quesito espacial,
+considerar também o temporal. \cite{abboodEnhancingDeepfakeDetection2026}
+
+Como observado na Tabela \ref{tab:todos_experimentos} houve uma melhoria considerável nas métricas de acurácia,
+\textit{Recall} real e principalmente em \textit{AUC-ROC}.
 
 \subsection{Análise do desempenho}
 
+Para análisar a eficácia na detecção de \textit{deepfakes} através dos dados disponíveis é 
+necessário avaliar os comportamentos dos modelos e para isso 
+serão utilizadas as seguintes métricas:
+(\romannumeral 1) probabilidade de detecção,
+(\romannumeral 2) acurácia,
+(\romannumeral 3) probabilidade de detecção falsa,
+(\romannumeral 4) probabilidade de alarme falso,
+(\romannumeral 5) taxa de erro,
+(\romannumeral 6) coeficiente MCC,
+(\romannumeral 7) F1 score,
+(\romannumeral 8) especificidade.
+
 
 \section{Resultados e discussões}
+Com base nos dados da Tabela X podemos avaliar
+o desempenho dos modelos utilizados
+na detecção de \textit{deepfakes}.
 
-\subsection{Métricas de performance}
+
+\subsection{Probabilidade de detecção}
+
+\subsection{Acurácia}
+
+\subsection{Probabilidade de alarme falso}
+
+\subsection{Taxa de erro}
+
+\subsection{Coeficiente MCC}
+
+\subsection{F1 score}
+
+\subsection{Especificidade}
 
 \section{Conclusão}
 
