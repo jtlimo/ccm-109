@@ -21,6 +21,19 @@ def build_classifier(feature_dim: int = 768, l2_reg: float = 1e-4) -> keras.Mode
     model = keras.Model(inputs=inputs, outputs=outputs, name="deepfake_classifier")
     return model
 
+def build_temporal_classifier(sequence_length: int = 32, feature_dim: int = 768, dropout_rate: float = 0.3) -> keras.Model:
+    inputs = keras.layers.Input(shape=(sequence_length, feature_dim), name="sequence_input")
+    
+    x = keras.layers.Bidirectional(
+        keras.layers.GRU(64, return_sequences=False), 
+        name="bigru_layer"
+    )(inputs)
+    x = keras.layers.Dropout(dropout_rate)(x)
+    
+    outputs = keras.layers.Dense(1, activation='sigmoid', name="sigmoid_output")(x)
+    
+    model = keras.Model(inputs=inputs, outputs=outputs, name="temporal_deepfake_classifier")
+    return model
 
 class DeepfakeDetector:
     def __init__(self, backbone_path: str, classifier_path: str, img_size: int = 224):
