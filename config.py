@@ -18,35 +18,10 @@ SIGLIP2_INPUT_SIZE = 224
 SIGLIP2_MEAN = np.array([0.5, 0.5, 0.5], dtype=np.float32)
 SIGLIP2_STD = np.array([0.5, 0.5, 0.5], dtype=np.float32)
 
-model_files = glob.glob("model.*-*.keras")
-if not model_files:
-    print("⚠️ Nenhum modelo encontrado! Verifique se o treinamento foi executado.")
-    model_files = ["model.00-0.0000.keras"]
-model_files.sort(
-    key=lambda x: float(x.split('-')[1].replace('.keras', '')), 
-    reverse=True
-)
-
-model_widget = widgets.Dropdown(
-    options=model_files,
-    value=model_files[0],
-    description='Modelo:',
-    style={'description_width': '100px'},
-    layout=widgets.Layout(width='400px')
-)
-
 dataset_widget = widgets.Dropdown(
-    options=['Celeb-DF', 'DeeperForensics', 'Custom', 'FF++'],
+    options=['Celeb-DF','Custom', 'FF++'],
     value='FF++',
     description='Dataset:',
-    style={'description_width': '100px'},
-    layout=widgets.Layout(width='400px')
-)
-
-backbone_widget = widgets.Dropdown(
-    options=['Original (congelado)', 'Fine-tuned'],
-    value='Original (congelado)',
-    description='Backbone:',
     style={'description_width': '100px'},
     layout=widgets.Layout(width='400px')
 )
@@ -94,9 +69,7 @@ def choice_config():
     print("CONFIGURAÇÕES")
     print("=" * 60)
     display(
-    model_widget, 
     dataset_widget, 
-    backbone_widget,
     threshold_widget, 
     batch_size_widget,
     aggregation_widget,
@@ -105,9 +78,7 @@ def choice_config():
 
 def get_config():    
     cfg = {
-        "model_path": model_widget.value,
         "dataset": dataset_widget.value,
-        "use_finetuned": backbone_widget.value == 'Fine-tuned',
         "threshold": threshold_widget.value,
         "batch_size": batch_size_widget.value,
         "aggregation": aggregation_widget.value,
@@ -127,7 +98,6 @@ def get_config():
     
     DATASET_PATHS = {
         'Celeb-DF': '/dataset/Celeb-DF',
-        'DeeperForensics': '/dataset/DeeperForensics',
         'Custom': '/dataset/Custom',
         'FF++': '/dataset/FF',
     }

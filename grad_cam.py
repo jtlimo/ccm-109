@@ -8,6 +8,20 @@ from tensorflow.keras import Model
 import preprocess as pi
 
 
+def denormalize_siglip2(img) -> np.ndarray:
+    img_arr = np.array(img, dtype=np.float32)
+    
+
+    if img_arr.min() < 0:
+        img_arr = (img_arr * 0.5) + 0.5
+
+    elif img_arr.max() > 1.0:
+        img_arr = img_arr / 255.0
+
+    img_arr = np.clip(img_arr, 0.0, 1.0)
+    return (img_arr * 255).astype(np.uint8)
+
+
 def preprocess_frame_for_cam(frame, img_size=224) -> np.ndarray:
     if isinstance(frame, (str, Path)):
         img = cv2.imread(str(frame))
@@ -29,8 +43,7 @@ def preprocess_frame_for_cam(frame, img_size=224) -> np.ndarray:
 
 
 def make_gradcampp_vit_heatmap(detector, image, pred_index=0):
-    tensor_img = preprocess_frame_for_cam(image)
-
+    tensor_img = preprocess_frame_for_cam(image)         
     backbone = detector.backbone
     classifier = detector.classifier
 
@@ -108,28 +121,29 @@ def make_gradcampp_vit_heatmap(detector, image, pred_index=0):
     heatmap = heatmap / (heatmap.max() + 1e-8)
 
     pred_prob = float(preds[0][pred_index])
-    calibrated_heatmap = heatmap * pred_prob
 
-    return calibrated_heatmap, pred_prob
+    return heatmap, pred_prob
 
 
 def overlay_heatmap(
-    image: np.ndarray, heatmap: np.ndarray, alpha=0.45
+    image: np.ndarray, heatmap: np.ndarray, alpha=0.40
 ) -> np.ndarray:
-    if image.max() <= 1.0:
-        image = (image * 255).astype(np.uint8)
-    else:
-        image = image.astype(np.uint8)
+    rgb_img = denormalize_siglip2(image)
 
     heatmap_uint8 = (heatmap * 255).astype(np.uint8)
     heatmap_color = cv2.applyColorMap(heatmap_uint8, cv2.COLORMAP_JET)
     heatmap_color = cv2.cvtColor(heatmap_color, cv2.COLOR_BGR2RGB)
 
-    return cv2.addWeighted(image, 1 - alpha, heatmap_color, alpha, 0)
+    return cv2.addWeighted(rgb_img, 1 - alpha, heatmap_color, alpha, 0)
 
 
-def explain_video_frame(detector, frame):
-    heatmap, prob = make_gradcampp_vit_heatmap(detector, frame)
+def explain_video_frame(detector, frame, is_temporal=False, frame_detector=None):
+    model_for_cam = frame_detector if (is_temporal and frame_detector is not None) else detector
+
+    if model_for_cam is None:
+        raise ValueError("Para explicações em modelos temporais, 'frame_detector' deve ser fornecido.")
+    
+    heatmap, prob = make_gradcampp_vit_heatmap(model_for_cam, frame)
     return {
         "heatmap": heatmap,
         "pred_label": "fake" if prob > 0.5 else "real",
@@ -150,40 +164,46 @@ def plot_gradcam_explanations(
         axes = axes.reshape(2, 1)
 
     for i, (frame, expl) in enumerate(zip(original_frames, explanations)):
-        img_disp = np.array(frame)
-        if img_disp.max() <= 1.0:
-            img_disp = (img_disp * 255).astype(np.uint8)
+        rgb_disp = denormalize_siglip2(frame)
 
-        axes[0, i].imshow(img_disp)
+        frame_idx = expl.get("frame_idx", i)
+        prob_fake = expl.get("frame_prob", expl.get("pred_prob", 0.0))
+
+        axes[0, i].imshow(rgb_disp)
         axes[0, i].axis("off")
         axes[0, i].set_title(
-            f"Frame {expl['frame_idx']}\nProb FAKE: {expl['frame_prob']*100:.1f}%",
-            fontsize=11,
+            f"Frame #{frame_idx}\nProb FAKE: {prob_fake * 100:.1f}%",
+            fontsize=10,
             fontweight="bold",
+            color="#1e293b"
         )
 
-        overlay = overlay_heatmap(img_disp, expl["heatmap"], alpha=0.45)
+        overlay = overlay_heatmap(rgb_disp, expl["heatmap"], alpha=0.40)
         axes[1, i].imshow(overlay)
         axes[1, i].axis("off")
 
-        is_fake = expl["frame_prob"] > 0.5
+        is_fake = prob_fake > 0.5
         title_color = "#dc2626" if is_fake else "#16a34a"
         lbl_str = "FAKE" if is_fake else "REAL"
 
         axes[1, i].set_title(
-            f"Grad-CAM++ [{lbl_str}]\nAtivação: {expl['frame_prob']:.3f}",
-            fontsize=11,
+            f"Grad-CAM++ [{lbl_str}]\nScore: {prob_fake:.3f}",
+            fontsize=10,
             fontweight="bold",
             color=title_color,
         )
 
+    label_color = "#dc2626" if video_label.lower() == "fake" else "#16a34a"
     plt.suptitle(
         f"Explicabilidade Grad-CAM++ | Vídeo: {video_label.upper()}\n"
-        f"(Azul/Ciano = Região Neutra/Real | Amarelo/Vermelho = Artefato de Manipulação/Fake)",
+        f"(Regiões Quentes = Focos de Atenção da Rede)",
         fontsize=13,
         fontweight="bold",
+        color=label_color,
         y=1.03,
     )
     plt.tight_layout()
+    fig.subplots_adjust(hspace=0.35)
+    
     plt.show()
     return fig
