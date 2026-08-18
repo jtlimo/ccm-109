@@ -9,7 +9,8 @@
 \usepackage{lipsum}
 \usepackage{csquotes}
 \usepackage{booktabs}
-\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{subcaption}
 \usepackage{url}
 \usepackage[section]{placeins}
 \usepackage[
@@ -301,39 +302,304 @@ Como observado na Tabela \ref{tab:todos_experimentos} houve uma melhoria conside
 Para análisar a eficácia na detecção de \textit{deepfakes} através dos dados disponíveis é 
 necessário avaliar os comportamentos dos modelos e para isso 
 serão utilizadas as seguintes métricas:
-(\romannumeral 1) probabilidade de detecção,
-(\romannumeral 2) acurácia,
-(\romannumeral 3) probabilidade de detecção falsa,
-(\romannumeral 4) probabilidade de alarme falso,
-(\romannumeral 5) taxa de erro,
-(\romannumeral 6) coeficiente MCC,
-(\romannumeral 7) F1 score,
-(\romannumeral 8) especificidade.
+(\romannumeral 1) acurácia,
+(\romannumeral 2) falso positivo,
+(\romannumeral 3) taxa de erro,
+(\romannumeral 4) coeficiente MCC,
+(\romannumeral 5) F1 score,
+(\romannumeral 6) especificidade.
 
 
 \section{Resultados e discussões}
-Com base nos dados da Tabela X podemos avaliar
+Com base nos dados da Tabela \ref{tab:metricas} podemos avaliar
 o desempenho dos modelos utilizados
-na detecção de \textit{deepfakes}.
+na detecção de \textit{deepfakes} na validação cruzada \textit{in-domain}.
+
+\begin{table}[htbp]
+\centering
+\caption{Comparativo de Métricas de Avaliação dos Modelos espacial e temporal \textit{in-domain}}
+\label{tab:metricas}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Métrica} & \textbf{Modelo espacial} & \textbf{Modelo temporal} \\
+\midrule
+Acurácia           & 75,48\% & 92,05\% \\
+AUC-ROC            & 0,8150  & 0,9825  \\
+F1-Score           & 0,8391  & 0,9214  \\
+Precisão           & 0,9279  & 0,9315  \\
+Revocação (Recall) & 0,7657  & 0,8773  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Os resultados da predição \textit{cross-domain} nos \textit{datasets} \textit{Celeb-DF} e customizado
+podem ser averiguados na Tabela \ref{tab:metricas_comparativo_geral}.
+
+\begin{table}[htbp]
+\centering
+\caption{Comparativo de Métricas de Avaliação dos Modelos temporal e espacial nos \textit{datasets} \textit{cross-domain}}
+\label{tab:metricas_comparativo_geral}
+\begin{tabular}{lcccc}
+\toprule
+\multirow{2}{*}{\textbf{Métrica}} & \multicolumn{2}{c}{\textbf{Celeb-DF}} & \multicolumn{2}{c}{\textbf{Customizado}} \\
+\cmidrule(lr){2-3} \cmidrule(lr){4-5}
+ & \textbf{Temporal} & \textbf{Espacial} & \textbf{Temporal} & \textbf{Espacial} \\
+\midrule
+Acurácia           & 52,16\% & 68,45\% & 48,39\% & 54,84\% \\
+Taxa de erro       & 47,84\% & 31,55\% & 51,61\% & 45,16\% \\
+AUC-ROC            & 0,6508  & 0,8047  & 0,4750  & 0,5562  \\
+F1-Score           & 0,4741  & 0,6545  & 0,4806  & 0,5484  \\
+Precisão           & 0,5430  & 0,7712  & 0,5000  & 0,5625  \\
+Revocação (Recall) & 0,2250  & 0,9700  & 0,4839  & 0,5484  \\
+Coeficiente MCC    & 0,0677  & 0,4432  & -0,0380 & 0,0958  \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+A Figura \ref{fig:geral} apresenta o desempenho unificado nos testes realizados com os modelos espacial
+e temporal, atesta a superioridade do modelo espacial,
+em contrapartida os dois modelos não tiveram um desempenho
+acima da média, conforme ocorrido nos testes \textit{in-domain}.
+
+\begin{figure}[htbp]
+    \centering
+    
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{grafico_a_celebdf.pdf}
+        \caption{Desempenho no \textit{dataset} Celeb-DF}
+        \label{fig:celeb}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{grafico_c_custom.pdf}
+        \caption{Desempenho no \textit{dataset} Custom}
+        \label{fig:custom}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{grafico_b_ffplus.pdf}
+        \caption{Desempenho no \textit{dataset} FF++}
+        \label{fig:ff}
+    \end{subfigure}
+    
+    \caption{Desempenho \textit{cross-domain} e \textit{in-domain}}
+    \label{fig:geral}
+\end{figure}
+
+O modelo temporal em \textit{cross-domain} no Celeb-DF, obteve uma curva ROC que beira a aleatoriedade.
+A matriz de confusão confirma a extrapolação do modelo em classificar vídeos \textit{fakes} como reais.
+Já o modelo espacial, conseguiu ter um desempenho melhor, porém ao analisar a matriz de confusão nota-se
+um padrão inverso. O modelo tende a classificar vídeos reais como \textit{fakes}.
+Este desbalanceamento de classe, faz com que cada modelo tenha uma alta acurácia na classe dominante, conforme
+ilustrado na Figura \ref{fig:matriz_celeb_df}.
+
+\begin{figure}[htbp]
+    \centering
+    
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{confusion-matriz-celeb-df-temporal.png}
+        \caption{Modelo temporal}
+        \label{fig:temporal}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{matriz_roc_espacial_celeb-df.png}
+        \caption{Modelo espacial}
+        \label{fig:espacial}
+    \end{subfigure}
+    
+    \caption{Matriz de confusão e curva ROC \textit{cross-domain} no Celeb-DF}
+    \label{fig:matriz_celeb_df}
+\end{figure}
+
+No caso do \textit{dataset} customizado o desempenho foi extremamente aleatório, tanto no modelo espacial
+quanto no modelo temporal, sendo o último o que obteve o pior desempenho na métrica AUC, com valor abaixo
+do limítrofe de 0,5, conforme ilustra a Figura \ref{fig:matriz_custom}.
 
 
-\subsection{Probabilidade de detecção}
+\begin{figure}[htbp]
+    \centering
+    
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{matriz_roc_temporal_custom.png}
+        \caption{Modelo temporal}
+        \label{fig:temporal_custom}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{matriz_roc_frame_custom.png}
+        \caption{Modelo espacial}
+        \label{fig:espacial_custom}
+    \end{subfigure}
+    
+    \caption{Matriz de confusão e curva ROC \textit{cross-domain} Customizado}
+    \label{fig:matriz_custom}
+\end{figure}
 
-\subsection{Acurácia}
+\subsection{Explicabilidade}
 
-\subsection{Probabilidade de alarme falso}
+Com o intuito de analisar e compreender como os modelos se comportam na tomada de decisão,
+foi utilizada a biblioteca grad-cam, adaptada para \textit{transformers}.
+Com esta possibilidade, foram realizados testes em vídeos específicos tanto \textit{fakes} quanto reais
+dos \textit{datasets} \textit{cross-domain} Celeb-DF e Custom.
 
-\subsection{Taxa de erro}
+O modelo temporal não conseguiu distinguir o vídeo \textit{fake} do real, apesar de
+classificar corretamente o vídeo real, o que reafirma o que foi apresentado
+na matriz de confusão, a tendência de sempre classificar os vídeos como reais. A Figura \ref{fig:gc_celeb} demonstra
+a explicabilidade dos dois vídeos analisados.
+Para o modelo espacial, a explicabilidade para os vídeos escolhidos, a classificação foi feita corretamente.
+O que explica a gradual melhora deste modelo em comparação ao temporal,
+conforme ilustra a Figura \ref{fig:gc_espacial_celeb}.
 
-\subsection{Coeficiente MCC}
+\begin{figure}[htbp]
+    \centering
+    
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{gc_fake_real_temporal_celeb-df.png}
+        \caption{Vídeo \textit{fake}}
+        \label{fig:fake_celeb}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{gc_real_real_temporal_celeb-df.png}
+        \caption{Vídeo real}
+        \label{fig:real_celeb}
+    \end{subfigure}
+    
+    \caption{Explicabilidade Grad-CAM no \textit{dataset} Celeb-DF (Modelo temporal)}
+    \label{fig:gc_celeb}
+\end{figure}
 
-\subsection{F1 score}
+\begin{figure}[htbp]
+    \centering
+    
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{gc_real_real_espacial_celeb.png}
+        \caption{Vídeo real}
+        \label{fig:real_real_celeb}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{gc_fake_fake_espacial_celeb.png}
+        \caption{Vídeo \textit{fake}}
+        \label{fig:fake_fake_celeb}
+    \end{subfigure}
+    
+    \caption{Explicabilidade Grad-CAM no \textit{dataset} Celeb-DF (Modelo espacial)}
+    \label{fig:gc_espacial_celeb}
+\end{figure}
 
-\subsection{Especificidade}
+
+No \textit{dataset} customizado tanto para o modelo temporal quanto o modelo espacial,
+a explicabilidade confirmou os dados da matriz de confusão.
+O modelo age em caráter praticamente aleatório,
+conforme ilustram as Figuras \ref{fig:gc_real_fake_custom} e \ref{fig:gc_fake_real_custom}
+
+
+\begin{figure}[htbp]
+    \centering
+    
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{gc_real_fake_espacial_custom.png}
+        \caption{Vídeo real classificado como \textit{fake} no modelo espacial}
+        \label{fig:real_fake_esp_custom}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{gc_real_fake_temporal_custom.png}
+        \caption{Vídeo real classificado como \textit{fake} no modelo temporal}
+        \label{fig:real_fake_temp_custom}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{agregacao_real_fake_espacial_custom.png}
+        \caption{\textit{Score} agregado modelo espacial}
+        \label{fig:ag_real_fake_custom}
+    \end{subfigure}
+    
+    \caption{Explicabilidade Grad-CAM no \textit{dataset} Custom}
+    \label{fig:gc_real_fake_custom}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{gc_fake_real_espacial_custom.png}
+        \caption{Vídeo \textit{fake} classificado como real no modelo espacial}
+        \label{fig:fake_real_esp_custom}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{gc_fake_real_temporal_custom.png}
+        \caption{Vídeo \textit{fake} classificado como real no modelo temporal}
+        \label{fig:fake_real_temp_custom}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{agregacao_fake_real_espacial_custom.png}
+        \caption{\textit{Score} agregado modelo espacial}
+        \label{fig:ag_fake_real_custom}
+    \end{subfigure}
+    
+    \caption{Explicabilidade Grad-CAM no \textit{dataset} Custom}
+    \label{fig:gc_fake_real_custom}
+\end{figure}
 
 \section{Conclusão}
+Neste trabalho foi realizada a construção de dois modelos de detecção de \textit{deepfakes}:
+um modelo temporal e outro espacial.
+
+Dentre os modelos implementados o que apresentou as melhores métricas de desempenho foi o modelo
+temporal dentro do contexto \textit{in-domain}. Em relação aos testes \textit{cross-domain},
+tanto o modelo temporal quanto o espacial tiveram uma degradação de performance.
+Esta degradação ocorreu principalmente no \textit{dataset} customizado. Já no Celeb-DF os modelos
+não atingiram o desempenho obtido no FF++, mas o modelo espacial conseguiu ter uma acurácia de 68,45\%
+sendo a variação de 7\% em relação ao resultado obtido no FF++.
+
+A generalização em outros domínios é uma das dificuldades no estudo e implementação de
+modelos de detecção de \textit{deepfakes}.
+Os resultados apresentados corroboram com a 
+necessidade de aprimoramento e validação em outros contextos.
+
 
 \section{Trabalhos Futuros}
+A dificuldade encontrada durante o desenvolvimento desse
+artigo foi a adaptação do GRAD-CAM para o contexto de \textit{transformers}.
+
+Com base nessa dificuldade em trabalhos futuros seria interessante investigar
+o uso de outras ferramentas específicas que se adaptem melhor a este contexto,
+como por exemplo, \textit{Attention Rollout}. 
+Apesar do \textit{Attention Rollout} demonstrar
+aonde o modelo dedicou a atenção e o objetivo com o GRAD-CAM era entender
+o que faz o modelo decidir se um vídeo é ou não real.
+
+Outra questão interessante seria conseguir treinar os modelos
+com outros \textit{datasets}. O FF++ apesar de abranger diversas técnicas de manipulação,
+estas técnicas estão defasadas. A validação cruzada prova este quesito
+ao testar vídeos no \textit{dataset} Celeb-DF e no customizado, nos quais
+há vídeos com manipulações mais sofisticadas do que as realizadas no FF++.
+
+Por fim, buscar a melhoria do modelo temporal, testar outras técnicas, além
+de pensar em um modelo multimodal, que contemple áudio e objetos
+que participem da cena.
 
 \printbibliography
 
