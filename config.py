@@ -97,9 +97,9 @@ def get_config():
     }
     
     DATASET_PATHS = {
-        'Celeb-DF': '/dataset/Celeb-DF',
-        'Custom': '/dataset/Custom',
-        'FF++': '/dataset/FF',
+        'Celeb-DF': 'dataset/Celeb-DF',
+        'Custom': 'dataset/Custom',
+        'FF++': 'dataset/FF',
     }
     
     base_path = DATASET_PATHS.get(cfg['dataset'], '')
@@ -108,5 +108,6 @@ def get_config():
     cfg["frames_output_dir"] = os.path.join(base_path, "frames")
     cfg["fake_dir"] = os.path.join(base_path, "fake")
     cfg["real_dir"] = os.path.join(base_path, "real")
+    cfg["embeddings_cache"] = os.path.join(base_path, '')
     
     return cfg
