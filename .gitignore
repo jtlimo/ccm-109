@@ -8,3 +8,5 @@ __pycache__
 venv_3.11
 .vscode
 .DS_Store
+article/*.png
+article/*.pdf
